@@ -15,7 +15,7 @@ layout: default
 
     <div style="display: inline-block;">
         <!-- Social media shares -->
-        {% if include.is_post %} {% include social/share_buttons.html %} {% endif %}
+        {% if include.is_post %} {% include social/share_buttons.liquid %} {% endif %}
 
         <!-- Tag list -->
         {% capture tag_list %}{{ page.tags | join: "|"}}{% endcapture %}
