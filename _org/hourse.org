@@ -1,0 +1,45 @@
+#+TITLE: Hourse
+|---+---+---+---+---+---|
+|   |   |   |   |   |   |
+|---+---+---+---+---+---|
+|   |   | 5 |   | 6 |   |
+|---+---+---+---+---+---|
+|   | 4 |   |   |   | 7 |
+|---+---+---+---+---+---|
+|   |   |   | x |   |   |
+|---+---+---+---+---+---|
+|   | 3 |   |   |   | 8 |
+|---+---+---+---+---+---|
+|   |   | 2 |   | 1 |   |
+|---+---+---+---+---+---|
+|   |   |   |   |   |   |
+|---+---+---+---+---+---|
+
+p1(x +1, y+2),p2 (x -1, y+2),
+p3(x-2, y+1), p4(x-2, y-1)
+p5(x -1, y-2),p6(x +1, y-2),
+p7(x+2, y-1), p8(x+2, y+1)
+
+
+1, create array 2d 8x8
+array[8][8] = {0};
+
+2, from each point on array and the point haven't marked yet
+steps = {{1,2}, {-1, 2}, {-2,1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}, {2, 1}};
+
+void walk(int stepi, int x, int y)
+{
+   stepi++;
+   array[x][y] = stepi;
+   if(x < 0 || y < 0)
+      return;
+
+    next_step = x + steps[x];
+    next_step = y + steps[y];
+
+    if(0 <= next_stepx< 8 and  0 <= next_stepy< 8 && array[next_stepx][next_stepy])
+       walk(step_i, next_stepx, next_stepy);
+
+    array[x][y] = 0;
+    stepi--;
+}
