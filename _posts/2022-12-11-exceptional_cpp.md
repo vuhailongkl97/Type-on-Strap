@@ -1,5 +1,7 @@
 ---
-published: false
+published: true
+tag:
+  - cpp
 ---
 # Tóm tắt Exceptional C Plus Plus
 ## Sử dụng iterator và thư viện
@@ -52,7 +54,4 @@ copy(arr1.begin(), arr1.end(), arr2.begin()); // exception safety by library cho
 
 ```
 + 
-### Item 
-
-
-
+### Item
