@@ -47,10 +47,13 @@ theo đoạn code trên có các điểm làm lãng phí tài nguyên.
 Mô tả các rule, kinh nghiệm viết code an toàn. tránh side effect và những lỗi tiềm ẩn với exception.
 một (đoạn) chương trình được đảm bảo exception safety theo các tiêu chí sau:
 + Đảm bảo đoạn chương tình đó sử dụng, giải phóng tài nguyên đúng đắn ngay cả khi exception xảy ra vd (std::bad_alloc, std::runtime,..).
-+ Đảm bảo tài nguyên được an toàn ví dụ khi đang copy 1 array 1-> array 2 và exception xảy ra thì cần đảm bảo array2 phải recover được trạng thái trước copy, chỉ được phép copy khi không có bất kì exception nào xảy ra trong quá trình copy
++ Đảm bảo tài nguyên được an toàn ví dụ khi đang copy 1 array 1-> array 2 và exception xảy ra thì cần đảm bảo array2 phải recover được trạng thái trước copy, chỉ được phép copy khi không có bất kì exception nào xảy ra trong quá trình copy  
+
 ```
 vector<int> arr1, arr2;
-copy(arr1.begin(), arr1.end(), arr2.begin()); // exception safety by library cho các kiểu dữ kiểu nguyên bản của c++ (int, char, long,...) còn đối với class khi ta sử dụng copy như trên đoạn code đó sẽ không đảm bảo exception safety.
+copy(arr1.begin(), arr1.end(), arr2.begin()); 
+// exception safety by library cho các kiểu dữ kiểu nguyên bản của c++ (int, char, long,...).
+Với class khi ta sử dụng copy như trên đoạn code đó sẽ không đảm bảo exception safety.
 
 ```
 + 
