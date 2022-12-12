@@ -39,7 +39,7 @@ string FindAddr( list<Employee> emps, string name ) (1)
 theo đoạn code trên có các điểm làm lãng phí tài nguyên.  
 (1). nên dùng const & thay vì copy giá trị  
 (2). việc recalculate emps.end() là không cần thiết.  
-(3). \*i nghĩa là từ kiểu Employee cần implement việc cast về string -> tạo ra temporary string thay vào đó ta có thể implement 1 method compare cho lớp Employee ví dụ i.compare(name).
+(3). \*i nghĩa là từ kiểu Employee cần implement việc cast về string hoặc đã overload == operator -> tạo ra temporary string thay vào đó ta có thể implement 1 method compare cho lớp Employee ví dụ i.compare(name).
 
 Để tránh gặp phải những đoạn code như trên ta nên sử dụng các function đã được define trong std::algorithm như std::find thay vì viết for loop như ví dụ trên, thư viện đã tối ưu và loại bỏ những nhược điểm không đáng có.
 
@@ -92,7 +92,7 @@ class Vector {
 }
 ```
 
-#### Summary
+### Summary
 ```
 The advice "be aware, drive with care" certainly applies to writing exception-safe code for containers and
 other objects. To do it successfully, you do have to meet a sometimes significant extra duty of care. But
@@ -103,4 +103,115 @@ exception-safe and exception-neutral. The advantages can be both concrete and we
 your library and your library's users
 ```
 
-### 
+## Code complexity
+### Item 19 có rất nhiều hiden code branch bị ẩn đi với exception
+```
+String EvaluateSalaryAndReturnName( Employee e )
+{
+   if( e.Title() == "CEO" || e.Salary() > 100000 )
+   {
+      cout << e.First() << " " << e.Last() << " is overpaid" << endl;
+   }
+   return e.First() + " " + e.Last();
+}
+```
+#### Đánh giá:
+Có tổng 23 branchs có thể xảy ra đối với hàm bên trên trong đó : 
++ 3 branchs là nonexception
++ 20 branchs là branch do exceptions có thể có khi create/update temporary object.
+Hàm bên trên thỏa mãn basic exception guarantee (không gây leak) nhưng không thỏa mãn strong exception guarantee (side effects) do có exception có thể tồn tại giữa cout và return. Một khi exception xảy ra giữa -> return result sẽ lỗi tuy nhiên cout có thể vẫn in ra được một số ký tự -> *side effect*.
+#### make better:
+```
+unique_ptr<String>
+EvaluateSalaryAndReturnName( Employee e )
+{
+  unique_ptr<String> result = new String( e.First() + " " + e.Last() );
+  if( e.Title() == "CEO" || e.Salary() > 100000 )
+  {
+     String message = (*result) + " is overpaid\n";
+     cout << message;
+  }
+  return result;
+}
+```
+Khi đó sẽ đảm bảo exception safety. không cấp phát thêm vùng nhớ ( không tạo thêm temporary string object mà chỉ return pointer -> strong exception safe  
+
+
+## Class Design and Inheritance
+Template 
+```
+class Complex {
+   public:
+    explicit Complex(double real, double imaginary = 0)
+        : real_(real), imaginary_(imaginary) {}
+    Complex& operator+=(const Complex& other) {
+        real_ += other.real_;
+        imaginary_ += other.imaginary_;
+        return *this;
+    }
+    Complex& operator++() {
+        ++real_;
+        return *this;
+    }
+    const Complex operator++(int) {
+        Complex temp(*this);
+        ++*this;
+        return temp;
+    }
+    ostream& Print(ostream& os) const {
+        return os << "(" << real_ << "," << imaginary_ << ")";
+    }
+
+   private:
+    double real_, imaginary_;
+};
+const Complex operator+(const Complex& lhs, const Complex& rhs) {
+    Complex ret(lhs);
+    ret += rhs;
+    return ret;
+}
+ostream& operator<<(ostream& os, const Complex& c) { return c.Print(os); }
+```
+
+```
+#include<iostream>
+#include <complex>
+    using namespace std;
+class Base {
+   public:
+    virtual void f(int);
+    virtual void f(double);
+    virtual void g(int i = 100);
+};
+void Base::f(int) { cout << "Base::f(int)" << endl; }
+void Base::f(double) { cout << "Base::f(double)" << endl; }
+void Base::g(int i) { cout << i+90 << endl; }
+class Derived : public Base {
+   public:
+    void f(complex<double>);
+    void g(int i = 20) override;
+};
+void Derived::f(complex<double>) { cout << "Derived::f(complex)" << endl; }
+void Derived::g(int i) { cout << "Derived::g() " << i << endl; }
+int main() {
+    Base b;
+    Derived d;
+    Base* pb = new Derived;
+    b.f(1.0); // call base method
+    d.f(1.0); // call derived method
+    pb->f(1.0); call derived method due to base method is hiden ( use using to fix)
+    b.g(); // call base;
+    d.g();  // call derived method(i = 20);
+    pb->g(); // call derived::g(i = 10) see note below
+    delete pb; // bug virtual base to correct
+    return 0;
+}
+```
+####  Note
+Like overloads, default parameters are taken from the static type
+
+
+
+
+
+
