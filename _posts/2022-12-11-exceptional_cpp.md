@@ -56,5 +56,51 @@ copy(arr1.begin(), arr1.end(), arr2.begin());
 Với class khi ta sử dụng copy như trên đoạn code đó sẽ không đảm bảo exception safety.
 
 ```
-+ 
-### Item
++ Đảm bảo phía client sẽ không phải handle exceptions vì internal function được gọi đã handle ví dụ hàm đó chỉ trả về true or false thay vì exceptions.
+### Item 13 ví dụ về exception guarantee
++ copy and swap idiom. nhằm tránh việc duplicate code với copy constructor, không cần quan tâm việc delete với point cũ trong this pointer( đã automatically calling the destructor cho tmp obj) và đồng thời đảm bảo exception safety vì dòng 2,3 nào can't throw. Chỉ duy nhất việc copy vào *other* nếu failed thì sẽ xảy ra exception và phía client cần handle điều đó.
+```
+    Derived & operator = (Derived other) {
+        swap(this->p , other.p);
+        return *this;
+    }
+```
+khi so sánh với các làm thông thường bên dưới.
+```
+  Derived & operator = (const Derived &other) {
+    if( this != &other )
+    {
+      T* v_new = NewCopy( other.v_,
+      other.vsize_,
+      other.vsize_ );
+      delete[] v_; // this can't throw
+      v_ = v_new; // take ownership
+      vsize_ = other.vsize_;
+      vused_ = other.vused_;
+    }
+    return *this; // safe, no copy involved
+  }
+```
+
+### Item 15: try/catch
++ Việc throw lại 1 exception mới có thể dẫn đến side effect vì client source code có thể đã handle exception cũ do vậy cần chú ý, hạn chế throw khi không cần thiết.
++ Việc define các exception specification cho 1 class là không cần thiết đặc biệt đối với trường hợp class đó là generic vì ta không thể biết T ở đó là gì và những exception có thể có với khi thao tác với T
+```
+template <typename T>
+class Vector {
+ ...
+}
+```
+
+#### Summary
+```
+The advice "be aware, drive with care" certainly applies to writing exception-safe code for containers and
+other objects. To do it successfully, you do have to meet a sometimes significant extra duty of care. But
+don't get unduly frightened by exceptions. Apply the guidelines outlined above—that is, isolate your resource
+management, use the "update a temporary and swap" idiom, and never write classes whose destructors can
+allow exceptions to escape—and you'll be well on your way to safe and happy production code that is both
+exception-safe and exception-neutral. The advantages can be both concrete and well worth the trouble for
+your library and your library's users
+```
+
+### 
