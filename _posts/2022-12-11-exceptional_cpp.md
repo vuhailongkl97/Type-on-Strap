@@ -207,11 +207,20 @@ int main() {
     return 0;
 }
 ```
+
+### Item 24 compositon over inheritence
+Tùy thuộc vào tính chất requirement mà ta sẽ lựa chon inherit hoặc composition.
++ Inherit khi cần 'IS A' relationship dấu hiều là có các virtual method ử lớp base, cần thay đổi các thuộc tính, customize ở protected access modifier  
++ composition khi 'HAS A' relationship dấu hiều ngược lại so với inherit, composition giúp hạn chế coupling giữa các class với nhau  
+Đối với inherit khi 1 class ở lớp base thay đổi kéo theo derived class cũng thay đổi theo, đặc biệt độ phúc tạp sẽ lớn hơn khi 1 derived class kế thừa từ nhiều base class và tạo thành nhiều lớp trong cây kế thừa.
+
+Đối với composition ta có thể sử dụng abstraction có các class cần 'inject' vào 1 class khác để sử dụng như 1 client thông thường qua các public method/ attribute.  
+
+
+
+
+
 ####  Note
-Like overloads, default parameters are taken from the static type
++ Like overloads, default parameters are taken from the static type  
 
-
-
-
-
-
++ Never inherit publicly to reuse (code in the base class); inherit publicly in order to be reused (by existing code that uses base objects polymorphically).
