@@ -216,9 +216,35 @@ Tùy thuộc vào tính chất requirement mà ta sẽ lựa chon inherit hoặc
 
 Đối với composition ta có thể sử dụng abstraction có các class cần 'inject' vào 1 class khác để sử dụng như 1 client thông thường qua các public method/ attribute.  
 
+## Pimpl 
+pos:
++ It's sometimes tempting to cut corners in the name of "reducing dependencies" or in the name of "efficiency,"
+
+cons:  
++ make overhead heap allocation for the pimpl pointer.
+
+### When will pimpl be used
++ put all nonvirtual, private members into XImpl.
 
 
+### Name Lookup, Namespaces, and the interface Principal.
+Dựa trên tham số truyền vào hàm compiler có thể loopkup hàm được gọi cùng namespace với parameter truyền vào đó.
 
+Define the class in OOP:  
+*A class describes a set of data, along with the functions that operate on that data*.
+```
+#include <algorithm>
+#include <vector>
+int main() {
+    int ai[]= {1,2,3,1,2,9,0};
+    // sort(vi, vi+7); // failed due to sort must be implicit std::sort
+
+    std::vector<int> veci = {1,3,1,0,8,3};
+    sort(veci.begin(), veci.end());
+
+    return 0;
+}
+```
 
 ####  Note
 + Like overloads, default parameters are taken from the static type  
