@@ -250,3 +250,10 @@ int main() {
 + Like overloads, default parameters are taken from the static type  
 
 + Never inherit publicly to reuse (code in the base class); inherit publicly in order to be reused (by existing code that uses base objects polymorphically).
+
+## Memory management
+```
+Base* pb2 = new Derived[10];
+delete[] pb2;
+This is undefined behavior. The language requires that the static type of the pointer that is passed to operator delete[]() must be the same as its dynamic type. Scott Meyers' section, "Never Treat Arrays Polymorphically" 
+```
