@@ -247,7 +247,7 @@ int main() {
 ```
 
 ####  Note
-+ Like overloads, default parameters are taken from the static type  
++ Like overloads, default parameters are taken from the static type (see above code.)
 
 + Never inherit publicly to reuse (code in the base class); inherit publicly in order to be reused (by existing code that uses base objects polymorphically).
 
@@ -257,3 +257,40 @@ Base* pb2 = new Derived[10];
 delete[] pb2;
 This is undefined behavior. The language requires that the static type of the pointer that is passed to operator delete[]() must be the same as its dynamic type. Scott Meyers' section, "Never Treat Arrays Polymorphically" 
 ```
+```
+void* operator new(void \*ptr, size_t sz = 0);
+operator delete (void \*ptr);
+operator delete [] (void \*ptr);
+```
+Chú ý khi viết new/ delete operators cho 1 class cần đúng&đủ và tránh bị override theo scope ( global scope override class's new/delete operator) 
+
+### Note
+Sử dụng unique_ptr/shared_ptr khi có thể để đảm bảo code safety.
+
+## Traps, Pitfalls, and Anti-Idioms
+
+Tránh sử dụng implicit convertion/constructor. Có thể ta không lường trước được việc convert đó. Thay vào đó hãy sử dụng *explicit constructor*
+```
+class Base {
+public:
+    explicit Base (int x ) {
+        std::cout << __func__ <<"\n";
+    }
+};
+class Base2 {
+public:
+    Base2 (int x ) {
+        std::cout << __func__ <<"\n";
+    }
+};
+int main() {
+
+    // Base x = 12; // is error
+    Base2 x2 = 12; // ok
+    return 0;
+}
+```
+
+
+
+
