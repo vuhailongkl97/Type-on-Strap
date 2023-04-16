@@ -37,3 +37,24 @@ It can be done by
 
 + create chain callback ( is called when a new sample come in)
 
+## Notes
+
+need to understand what type of image is processing (RGBA, RGB, YUVI,..)
+```
+GstPad* pad = gst_element_get_static_pad(videotestsrc, "src");
+GstCaps* caps = gst_pad_get_current_caps(pad);
+
+if (caps) {
+  GstVideoInfo info;
+  if (gst_video_info_from_caps(&info, caps)) {
+    g_print("Video format: %dx%d, framerate=%d/%d, format=%s\n",
+            GST_VIDEO_INFO_WIDTH(&info), GST_VIDEO_INFO_HEIGHT(&info),
+            GST_VIDEO_INFO_FPS_N(&info), GST_VIDEO_INFO_FPS_D(&info),
+            gst_video_format_to_string(GST_VIDEO_INFO_FORMAT(&info)));
+  }
+
+  gst_caps_unref(caps);
+}
+
+gst_object_unref(pad);
+```
